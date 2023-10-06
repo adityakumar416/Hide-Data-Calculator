@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "608878159622",
+    "project_id": "calculator-locker-a95ef",
+    "storage_bucket": "calculator-locker-a95ef.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:608878159622:android:bb878f1a38a6c0c6982087",
+        "android_client_info": {
+          "package_name": "com.example.calculator"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBs_jLbJ-B8v8Bwh2PvH-0p3RaWuMLnHbo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
