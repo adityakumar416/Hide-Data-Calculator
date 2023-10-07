@@ -8,7 +8,9 @@ import android.view.View
 import android.view.View.OnLongClickListener
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.example.calculator.R
 import com.google.android.gms.tasks.OnFailureListener
@@ -26,6 +28,9 @@ class ShowImageAdapter(
     class ViewHolder(view: View):RecyclerView.ViewHolder(view){
 
         val image :ImageView = view.findViewById(R.id.imageView)
+        val imageName :TextView = view.findViewById(R.id.textView)
+        val listview_layout :ConstraintLayout = view.findViewById(R.id.listview_layout)
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -44,6 +49,7 @@ class ShowImageAdapter(
             holder.itemView.context.startActivity(intent)
         }
 
+        holder.imageName.text = currentImage.name
 
         Picasso
             .get()
@@ -55,7 +61,7 @@ class ShowImageAdapter(
             .load(imageModel.url)
             .into(holder.image)*/
 
-        holder.image.setOnLongClickListener(OnLongClickListener {
+        holder.listview_layout.setOnLongClickListener(OnLongClickListener {
             showDialog(currentImage)
             true
         })
@@ -64,8 +70,8 @@ class ShowImageAdapter(
     }
 
     private fun showDialog(imageModel: ImageModel) {
-        val firebaseStorage = FirebaseStorage.getInstance().getReference("images")
-        val databaseRef = FirebaseDatabase.getInstance().getReference("images")
+        val firebaseStorage = FirebaseStorage.getInstance().getReference("images/")
+        val databaseRef = FirebaseDatabase.getInstance().getReference("images/")
 
         MaterialAlertDialogBuilder(context)
             .setTitle("Delete Image")

@@ -7,4 +7,9 @@
     <color name="btnBackground">#FFFFFF</color>
     <color name="btnBackground2">#FF9800</color>
 
+
+    <color name="yellonote">#fecc80</color>
+    <color name="blacknote">#252525</color>
+    <color name="lessblacknote">#3b3b3b</color>
+    <color name="lesswhitenote">#656668</color>
 </resources>

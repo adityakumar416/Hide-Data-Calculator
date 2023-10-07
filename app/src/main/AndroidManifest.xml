@@ -13,6 +13,9 @@
         android:theme="@style/Theme.Calculator"
         tools:targetApi="31">
         <activity
+            android:name=".notes.HomeActivity"
+            android:exported="false" />
+        <activity
             android:name=".videos.VideoPlayerActivity"
             android:exported="false" />
         <activity
@@ -29,6 +32,12 @@
             android:exported="false" />
         <activity
             android:name=".LockerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".notes.UpdateNoteActivity"
+            android:exported="false" />
+        <activity
+            android:name=".notes.CreateNoteActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

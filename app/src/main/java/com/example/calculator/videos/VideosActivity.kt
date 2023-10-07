@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -49,8 +50,9 @@ class VideosActivity : AppCompatActivity(), VideoItemClickListener  {
 
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        videoAdapter = VideoAdapter(mutableListOf(),this) // Initialize with an empty list initially
+        videoAdapter = VideoAdapter(mutableListOf(),this,this) // Initialize with an empty list initially
         recyclerView.adapter = videoAdapter
+
 
         fetchVideoItemsFromFirebase()
 
@@ -108,8 +110,9 @@ class VideosActivity : AppCompatActivity(), VideoItemClickListener  {
         val storage = Firebase.storage
         val storageRef = storage.reference
 
+        val originalFileName = getOriginalFileName(videoUri)
         // Create a reference to the video file in Firebase Storage
-        val videoRef = storageRef.child("videos/${videoUri.lastPathSegment}")
+        val videoRef = storageRef.child("videos/$originalFileName")
 
 
             val processDialog = ProgressDialog(this@VideosActivity)
@@ -140,6 +143,23 @@ class VideosActivity : AppCompatActivity(), VideoItemClickListener  {
             }
 
     }
+
+    @SuppressLint("Range")
+    private fun getOriginalFileName(uri: Uri?): String {
+        // Use content resolver to get the original file name from the URI
+        val cursor = contentResolver.query(uri!!, null, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val displayName = it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                cursor.close()
+                return displayName
+            }
+        }
+        // If unable to get the original file name, generate a unique name or handle it as per your requirement
+        return "video_${System.currentTimeMillis()}.mp4"
+    }
+
+
 
     companion object {
         private const val PICK_VIDEO_REQUEST = 1

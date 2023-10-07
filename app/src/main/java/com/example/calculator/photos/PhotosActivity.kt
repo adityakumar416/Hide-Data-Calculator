@@ -1,5 +1,6 @@
 package com.example.calculator.photos
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.ContentValues
@@ -7,6 +8,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.provider.OpenableColumns
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -59,7 +61,7 @@ class PhotosActivity : AppCompatActivity() {
         imageList = arrayListOf()
 
 
-        val databaseReference = FirebaseDatabase.getInstance().getReference("images")
+        val databaseReference = FirebaseDatabase.getInstance().getReference("images/")
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 imageList.clear()
@@ -73,10 +75,11 @@ class PhotosActivity : AppCompatActivity() {
 
                 }
                   binding.recyclerview.layoutManager = LinearLayoutManager(this@PhotosActivity)
-               binding.recyclerview.layoutManager = GridLayoutManager(this@PhotosActivity, 4)
-
-
                 binding.recyclerview.adapter = ShowImageAdapter(imageList,this@PhotosActivity)
+
+
+
+                binding.recyclerview.layoutManager = GridLayoutManager(this@PhotosActivity, 4)
                 binding.recyclerview.adapter = ShowGridViewImageAdapter(imageList,this@PhotosActivity)
 
 
@@ -98,44 +101,69 @@ class PhotosActivity : AppCompatActivity() {
 
     }
 
-    private fun uploadFile() {
+    private fun uploadFile(uri: Uri) {
 
 
+        if (uri != null) {
+            val originalFileName = getFileName(uri)
+            val firebaseStorage =
+                FirebaseStorage.getInstance().getReference("images/$originalFileName")
+            val databaseRef =
+                FirebaseDatabase.getInstance().getReference("images/")
 
-                val firebaseStorage = FirebaseStorage.getInstance().getReference("images")
-                val databaseRef = FirebaseDatabase.getInstance().getReference("images")
+            val storageRef = firebaseStorage.child(
+                System.currentTimeMillis().toString() + "." + getFileExtension(this.uri)
+            )
+            storageRef.putFile(this.uri)
+                .addOnSuccessListener {
 
-                val storageRef = firebaseStorage.child(System.currentTimeMillis().toString()+"."+ getFileExtension(uri))
-                storageRef.putFile(uri)
-                    .addOnSuccessListener {
+                    Log.i(ContentValues.TAG, "onSuccess Main: $it")
 
-                        Log.i(ContentValues.TAG, "onSuccess Main: $it")
-
-                        Toast.makeText(this@PhotosActivity, "Upload Image Successfully", Toast.LENGTH_SHORT).show()
-
-
-                        val urlTask: Task<Uri> = it.storage.downloadUrl
-                        while (!urlTask.isSuccessful);
-                        val downloadUrl: Uri = urlTask.result
-                        Log.i(ContentValues.TAG, "onSuccess: $downloadUrl")
-
-                        val imageModel = ImageModel(databaseRef.push().key,"Aditya",downloadUrl.toString())
-                        val uploadId =imageModel.imageId
-
-                        if (uploadId != null) {
-                            databaseRef.child(uploadId).setValue(imageModel)
-                        }
+                    Toast.makeText(
+                        this@PhotosActivity,
+                        "Upload Image Successfully",
+                        Toast.LENGTH_SHORT
+                    ).show()
 
 
+                    val urlTask: Task<Uri> = it.storage.downloadUrl
+                    while (!urlTask.isSuccessful);
+                    val downloadUrl: Uri = urlTask.result
+                    Log.i(ContentValues.TAG, "onSuccess: $downloadUrl")
+
+                    val imageModel =
+                        ImageModel(databaseRef.push().key, originalFileName, downloadUrl.toString())
+                    val uploadId = imageModel.imageId
+
+                    if (uploadId != null) {
+                        databaseRef.child(uploadId).setValue(imageModel)
                     }
 
-                    .addOnFailureListener {
 
-                        Toast.makeText(this@PhotosActivity, "Failed to Upload Image", Toast.LENGTH_SHORT).show()
+        }
 
-                    }
+            .addOnFailureListener {
 
+                Toast.makeText(this@PhotosActivity, "Failed to Upload Image", Toast.LENGTH_SHORT)
+                    .show()
 
+            }
+    }
+
+    }
+
+    @SuppressLint("Range")
+    private fun getFileName(uri: Uri): String {
+        var result = ""
+        if (uri.scheme == "content") {
+            val cursor = contentResolver.query(uri, null, null, null, null)
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                }
+            }
+        }
+        return result
     }
 
 
@@ -156,7 +184,7 @@ class PhotosActivity : AppCompatActivity() {
 
             uri = data.data!!
 
-            uploadFile()
+            uploadFile(uri)
             try {
                 val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
 

@@ -53,5 +53,7 @@ class VideoPlayerActivity : AppCompatActivity() {
         // simply starting our video view.
         videoView.start()
 
+
+
     }
 }

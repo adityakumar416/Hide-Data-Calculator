@@ -9,11 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.example.calculator.databinding.ActivityMainBinding
 import net.objecthunter.exp4j.Expression
@@ -172,7 +170,7 @@ class MainActivity : AppCompatActivity() {
 
     
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.logout_menu,menu)
+        menuInflater.inflate(R.menu.calculator_home_menu,menu)
         return super.onCreateOptionsMenu(menu)
     }
 

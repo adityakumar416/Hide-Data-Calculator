@@ -1,23 +1,28 @@
 package com.example.calculator.videos
 
+import android.content.Context
+import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.calculator.R
-import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.storage.FirebaseStorage
 
 
 interface VideoItemClickListener {
     fun onVideoItemClicked(videoUrl: String)
 }
 
-class VideoAdapter(private val videoItems: MutableList<VideoModel>, private val clickListener: VideoItemClickListener) : RecyclerView.Adapter<VideoAdapter.VideoViewHolder>() {
+class VideoAdapter(private val videoItems: MutableList<VideoModel>, private val clickListener: VideoItemClickListener, private val context: Context) : RecyclerView.Adapter<VideoAdapter.VideoViewHolder>() {
 
     private var exoPlayer: SimpleExoPlayer? = null
 
@@ -46,7 +51,6 @@ class VideoAdapter(private val videoItems: MutableList<VideoModel>, private val 
     inner class VideoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val videoThumbnailImageView: ImageView = itemView.findViewById(R.id.videoThumbnailImageView)
         private val videoNameTextView: TextView = itemView.findViewById(R.id.videoNameTextView)
-        private val playerView: PlayerView = itemView.findViewById(R.id.playerView)
 
         fun bind(videoItem: VideoModel) {
             // Load video thumbnail using Glide
@@ -59,14 +63,50 @@ class VideoAdapter(private val videoItems: MutableList<VideoModel>, private val 
                 clickListener.onVideoItemClicked(videoItem.videoUrl)
             }
 
-           /* val player = SimpleExoPlayer.Builder(itemView.context).build()
-            playerView.player = player
-
-            val mediaItem = MediaItem.fromUri(videoItem.videoUrl)
-            player.setMediaItem(mediaItem)
-            player.prepare()
-            player.playWhenReady = true*/
+            itemView.setOnLongClickListener(View.OnLongClickListener {
+                showDialog(videoItem)
+                true
+            })
 
         }
     }
+
+    private fun showDialog(videoItem: VideoModel) {
+
+        val firebaseStorage = FirebaseStorage.getInstance().getReference("videos/")
+      //  val databaseRef = FirebaseDatabase.getInstance().getReference("images")
+
+        MaterialAlertDialogBuilder(context)
+            .setTitle("Delete Video")
+            .setMessage("Do you want to delete this Video ?")
+            .setNegativeButton("No", object : DialogInterface.OnClickListener{
+                override fun onClick(dialog: DialogInterface?, which: Int) {
+                    dialog?.dismiss()
+                }
+            })
+            .setPositiveButton("Yes",object : DialogInterface.OnClickListener{
+                override fun onClick(dialog: DialogInterface?, which: Int) {
+                    firebaseStorage.storage.getReferenceFromUrl(videoItem.videoUrl!!).delete().addOnSuccessListener(object :
+                        OnSuccessListener<Void> {
+                        override fun onSuccess(p0: Void?) {
+                            Toast.makeText(context, "Video deleted", Toast.LENGTH_SHORT).show()
+
+                            firebaseStorage.child(videoItem.videoUrl).delete()
+                            videoItems.remove(videoItem)
+
+                            notifyDataSetChanged()
+                        }
+                    })
+                        .addOnFailureListener(object : OnFailureListener {
+                            override fun onFailure(p0: Exception) {
+
+                            }
+
+                        })
+                }
+
+            }).show()
+    }
+
+
 }
