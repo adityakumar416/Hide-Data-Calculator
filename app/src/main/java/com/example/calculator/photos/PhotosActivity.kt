@@ -2,6 +2,7 @@ package com.example.calculator.photos
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ProgressDialog
 import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Intent
@@ -23,6 +24,7 @@ import com.example.calculator.LockerActivity
 import com.example.calculator.R
 import com.example.calculator.databinding.ActivityPhotosBinding
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -60,8 +62,10 @@ class PhotosActivity : AppCompatActivity() {
 
         imageList = arrayListOf()
 
+        val uid = FirebaseAuth.getInstance().currentUser!!.uid
 
-        val databaseReference = FirebaseDatabase.getInstance().getReference("images/")
+
+        val databaseReference =  FirebaseDatabase.getInstance().getReference(uid).child("images/")
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 imageList.clear()
@@ -102,23 +106,29 @@ class PhotosActivity : AppCompatActivity() {
     }
 
     private fun uploadFile(uri: Uri) {
-
+        val uid = FirebaseAuth.getInstance().currentUser!!.uid
 
         if (uri != null) {
             val originalFileName = getFileName(uri)
             val firebaseStorage =
-                FirebaseStorage.getInstance().getReference("images/$originalFileName")
+                FirebaseStorage.getInstance().getReference(uid).child("images/$originalFileName")
             val databaseRef =
-                FirebaseDatabase.getInstance().getReference("images/")
+                FirebaseDatabase.getInstance().getReference(uid).child("images/")
 
             val storageRef = firebaseStorage.child(
                 System.currentTimeMillis().toString() + "." + getFileExtension(this.uri)
             )
+
+            val processDialog = ProgressDialog(this@PhotosActivity)
+            processDialog.setMessage("Photo Uploading")
+            processDialog.setCancelable(false)
+            processDialog.show()
+
             storageRef.putFile(this.uri)
                 .addOnSuccessListener {
 
                     Log.i(ContentValues.TAG, "onSuccess Main: $it")
-
+                    processDialog.dismiss()
                     Toast.makeText(
                         this@PhotosActivity,
                         "Upload Image Successfully",
@@ -146,8 +156,14 @@ class PhotosActivity : AppCompatActivity() {
 
                 Toast.makeText(this@PhotosActivity, "Failed to Upload Image", Toast.LENGTH_SHORT)
                     .show()
+                processDialog.dismiss()
 
             }
+                .addOnProgressListener { taskSnapshot -> //displaying the upload progress
+                    val progress =
+                        100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount
+                    processDialog.setMessage("Uploaded " + progress.toInt() + "%...")
+                }
     }
 
     }

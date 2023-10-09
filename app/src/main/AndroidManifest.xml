@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -14,8 +14,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Calculator"
-        tools:targetApi="31">
-
+        tools:targetApi="31" >
+        <activity
+            android:name=".SettingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".userAuthentication.RegistrationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".userAuthentication.ResetPasswordActivity"
+            android:exported="false" />
         <activity
             android:name=".documents.DocumentActivity"
             android:exported="false" />
@@ -27,9 +38,6 @@
             android:exported="false" />
         <activity
             android:name=".videos.VideosActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SettingActivity"
             android:exported="false" />
         <activity
             android:name=".photos.ShowFullImageActivity"
@@ -47,8 +55,8 @@
             android:name=".notes.CreateNoteActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
-            android:exported="true">
+            android:name=".userAuthentication.LoginActivity"
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

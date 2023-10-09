@@ -24,7 +24,9 @@ class CreateNoteActivity : AppCompatActivity() {
 
         mAuth = FirebaseAuth.getInstance()
         onlineUserId = mAuth!!.currentUser?.uid.toString()
-        database = FirebaseDatabase.getInstance().reference.child("note")
+        val uid = FirebaseAuth.getInstance().currentUser!!.uid
+
+        database =FirebaseDatabase.getInstance().getReference(uid).child("note")
 
         binding.btnSaveNote.setOnClickListener {
 

@@ -26,11 +26,13 @@ import com.example.calculator.databinding.ActivityVideosBinding
 import com.example.calculator.photos.ImageModel
 import com.example.calculator.photos.ShowGridViewImageAdapter
 import com.example.calculator.photos.ShowImageAdapter
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 
@@ -74,7 +76,9 @@ class VideosActivity : AppCompatActivity(), VideoItemClickListener  {
 
     private fun fetchVideoItemsFromFirebase() {
         val storage = Firebase.storage
-        val storageRef = storage.reference.child("videos/") // Replace 'videos/' with your storage path
+        val uid = FirebaseAuth.getInstance().uid ?: return
+
+        val storageRef = FirebaseStorage.getInstance().getReference(uid).child("videos/") // Replace 'videos/' with your storage path
 
         val videoItems = mutableListOf<VideoModel>()
 
@@ -112,7 +116,9 @@ class VideosActivity : AppCompatActivity(), VideoItemClickListener  {
 
         val originalFileName = getOriginalFileName(videoUri)
         // Create a reference to the video file in Firebase Storage
-        val videoRef = storageRef.child("videos/$originalFileName")
+        val uid = FirebaseAuth.getInstance().uid ?: return
+
+        val videoRef = FirebaseStorage.getInstance().getReference(uid).child("videos/$originalFileName")
 
 
             val processDialog = ProgressDialog(this@VideosActivity)

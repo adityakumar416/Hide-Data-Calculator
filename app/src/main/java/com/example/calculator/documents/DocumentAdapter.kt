@@ -30,7 +30,7 @@ class DocumentAdapter(private val context: Context, private val documents: List<
     override fun onBindViewHolder(holder: DocumentViewHolder, position: Int) {
         val document = documents[position]
         holder.documentName.text = document.name
-       // holder.documentUrl.text = document.downloadUrl
+        holder.documentUrl.text = document.downloadUrl
 
         holder.itemView.setOnClickListener {
             openDocument(document.uri)

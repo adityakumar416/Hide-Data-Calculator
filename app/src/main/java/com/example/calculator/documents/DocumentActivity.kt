@@ -2,6 +2,7 @@ package com.example.calculator.documents
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.pdf.PdfRenderer
@@ -16,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.calculator.R
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.Dispatchers
@@ -39,8 +41,10 @@ class DocumentActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_document)
 
-        val storage = FirebaseStorage.getInstance()
-        storageReference = storage.reference.child("documents")
+        val uid = FirebaseAuth.getInstance().currentUser!!.uid
+
+        //val storage = FirebaseStorage.getInstance()
+        storageReference = FirebaseStorage.getInstance().getReference(uid).child("documents")
 
         val documentRecyclerView: RecyclerView = findViewById(R.id.documentRecyclerView)
         documentAdapter = DocumentAdapter(this,documents)
@@ -119,6 +123,11 @@ class DocumentActivity : AppCompatActivity() {
         val fileRef = storageReference.child(documentName)
         val uploadTask = fileRef.putFile(documentUri)
 
+        val processDialog = ProgressDialog(this@DocumentActivity)
+        processDialog.setMessage("Document Uploading")
+        processDialog.setCancelable(false)
+        processDialog.show()
+
         uploadTask.addOnSuccessListener { taskSnapshot ->
             fileRef.downloadUrl.addOnSuccessListener { downloadUri ->
                 val downloadUrl = downloadUri.toString()
@@ -126,12 +135,20 @@ class DocumentActivity : AppCompatActivity() {
                 val document = Document(documentId, documentName, documentUri, downloadUrl)
                 documents.add(document)
                 documentAdapter.notifyDataSetChanged()
+                processDialog.dismiss()
             }.addOnFailureListener { e ->
                 // Handle any errors that occurred during getting download URL
+                processDialog.dismiss()
             }
         }.addOnFailureListener { e ->
+            processDialog.dismiss()
             // Handle upload failures
         }
+            .addOnProgressListener { taskSnapshot -> //displaying the upload progress
+                val progress =
+                    100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount
+                processDialog.setMessage("Uploaded " + progress.toInt() + "%...")
+            }
     }
 
 

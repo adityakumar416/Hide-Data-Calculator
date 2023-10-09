@@ -110,7 +110,9 @@ class HomeActivity :  AppCompatActivity(), NoteAdapter.MyOnClickListener {
 
         mAuth = FirebaseAuth.getInstance()
         onlineUserId = mAuth!!.currentUser?.uid.toString()
-        database = FirebaseDatabase.getInstance().reference.child("note")
+
+        val uid = FirebaseAuth.getInstance().currentUser!!.uid
+        database =  FirebaseDatabase.getInstance().getReference(uid).child("note")
         database.addValueEventListener(object : ValueEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {
