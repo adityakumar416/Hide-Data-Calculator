@@ -184,7 +184,7 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/recycle_bin"
+                android:id="@+id/document"
                 android:layout_width="160dp"
                 android:layout_height="190dp"
                 android:layout_marginLeft="8dp"
@@ -205,14 +205,14 @@
                         android:layout_height="84dp"
 
                         android:padding="10dp"
-                        android:src="@drawable/trash_9664718" />
+                        android:src="@drawable/documents" />
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:gravity="center"
-                        android:text="Recycle bin"
+                        android:text="Document"
                         android:textSize="20sp"
                         android:textStyle="bold" />
 

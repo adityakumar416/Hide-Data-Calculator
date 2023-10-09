@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "608878159622",
+    "firebase_url": "https://calculator-locker-a95ef-default-rtdb.firebaseio.com",
     "project_id": "calculator-locker-a95ef",
     "storage_bucket": "calculator-locker-a95ef.appspot.com"
   },
@@ -12,7 +13,12 @@
           "package_name": "com.example.calculator"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "608878159622-kk79j9sumkocbg90ofe06fv9jtasajvd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBs_jLbJ-B8v8Bwh2PvH-0p3RaWuMLnHbo"
@@ -20,7 +26,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "608878159622-kk79j9sumkocbg90ofe06fv9jtasajvd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
