@@ -241,10 +241,10 @@ class PhotosActivity : AppCompatActivity() {
 
                 true
             }
-            R.id.delete_all ->{
+           /* R.id.delete_all ->{
                 Toast.makeText(this@PhotosActivity,"Delete all clicked", Toast.LENGTH_SHORT).show();
                 return true
-            }
+            }*/
 
             else -> super.onOptionsItemSelected(item)
         }

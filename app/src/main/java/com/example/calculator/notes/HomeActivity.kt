@@ -43,7 +43,7 @@ class HomeActivity :  AppCompatActivity(), NoteAdapter.MyOnClickListener {
         setContentView(R.layout.activity_home)
 
 
-        val fab = findViewById<FloatingActionButton>(R.id.fab_add_note)
+        val fab = findViewById<TextView>(R.id.fab_add_note)
         auth = FirebaseAuth.getInstance()
 
         fab.setOnClickListener{

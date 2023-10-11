@@ -10,12 +10,16 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.ParcelFileDescriptor
 import android.provider.OpenableColumns
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.calculator.LockerActivity
 import com.example.calculator.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
@@ -41,6 +45,14 @@ class DocumentActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_document)
 
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+
+        toolbar.setNavigationOnClickListener(View.OnClickListener {
+            val main = Intent(applicationContext, LockerActivity::class.java)
+            startActivity(main)
+        })
+
+
         val uid = FirebaseAuth.getInstance().currentUser!!.uid
 
         //val storage = FirebaseStorage.getInstance()
@@ -54,7 +66,7 @@ class DocumentActivity : AppCompatActivity() {
         // Fetch documents from Firebase Storage
         fetchDocuments()
 
-        val selectDocumentButton: Button = findViewById(R.id.selectDocumentButton)
+        val selectDocumentButton: TextView = findViewById(R.id.selectDocumentButton)
         selectDocumentButton.setOnClickListener {
             openFileChooser()
         }

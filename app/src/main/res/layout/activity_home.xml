@@ -18,20 +18,19 @@
         app:navigationIcon="@drawable/back_icon"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <TextView
         android:id="@+id/fab_add_note"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
-        android:clickable="true"
-        app:backgroundTint="@color/lesswhitenote"
+        android:layout_width="70dp"
+        android:layout_height="80dp"
+        android:background="@drawable/add_note"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/addnote"
-        tools:ignore="SpeakableTextPresentCheck"
-        android:contentDescription="TODO"
-        android:focusable="true" />
+        android:elevation="4dp"
+        app:layout_constraintHorizontal_bias="0.806"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.844" />
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview"
@@ -58,14 +57,14 @@
         android:id="@+id/load_create"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
         android:fontFamily="@font/psbold"
         android:text="Create note"
         android:textColor="@color/yellonote"
         android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="@+id/fab_add_note"
-        app:layout_constraintEnd_toStartOf="@+id/fab_add_note"
-        app:layout_constraintTop_toTopOf="@+id/fab_add_note" />
+        app:layout_constraintEnd_toEndOf="@+id/recyclerview"
+        app:layout_constraintHorizontal_bias="0.86"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fab_add_note" />
 
     <ProgressBar
         android:id="@+id/pbload"
