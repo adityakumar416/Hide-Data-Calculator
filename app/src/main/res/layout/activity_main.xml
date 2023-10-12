@@ -83,7 +83,7 @@
                 android:id="@+id/btn_back"
                 style="@style/operatorbutton"
                 android:onClick="onBackClick"
-                app:icon="@drawable/back_icon"
+                app:icon="@drawable/backspace"
                 app:iconTint="@color/btnBackground2" />
 
             <com.google.android.material.button.MaterialButton

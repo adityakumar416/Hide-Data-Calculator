@@ -2,7 +2,9 @@ package com.example.calculator
 
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.icu.util.Calendar
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -20,7 +22,7 @@ import java.lang.Exception
 
 @SuppressLint("SetTextI18n")
 class MainActivity : AppCompatActivity() {
-
+    private lateinit var sharedPreferences: SharedPreferences
     private lateinit var binding: ActivityMainBinding
     var lastNumeric = false
     var stateError = false
@@ -137,6 +139,9 @@ class MainActivity : AppCompatActivity() {
 
 
             try {
+                sharedPreferences = getSharedPreferences("SwitchState", Context.MODE_PRIVATE)
+                val switchState = sharedPreferences.getBoolean("SWITCH_STATE", false)
+
 
                 val result = expression.evaluate()
 
@@ -144,7 +149,7 @@ class MainActivity : AppCompatActivity() {
                 // Get the current updated minutes
                 val minutes = calendar.get(Calendar.MINUTE)
 
-                if(minutes.toDouble() ==result){
+                if((minutes.toDouble() ==result)&&(switchState==true)){
                     val intent = Intent(this,LockerActivity::class.java)
                     startActivity(intent)
                     finish()

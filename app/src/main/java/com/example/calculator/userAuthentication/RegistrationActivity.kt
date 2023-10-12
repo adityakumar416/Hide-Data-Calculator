@@ -41,7 +41,6 @@ class RegistrationActivity : AppCompatActivity() {
 
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
-            finish()
 
         }
 
@@ -70,11 +69,7 @@ class RegistrationActivity : AppCompatActivity() {
                 binding.confirmPasswordEditText.requestFocus()
                 Snackbar.make(binding.confirmPasswordEditText, "Confirm Password is Mandatory.", Snackbar.LENGTH_SHORT).show();
             }
-            /*    else if (binding.confirmPasswordEditText.text != binding.passwordEditText.text) {
-                    binding.confirmPasswordEditText.requestFocus()
-                    Toast.makeText(context,"Confirm Password are not same as the Password.", Toast.LENGTH_SHORT).show();
 
-                }*/
             else{
 
 
@@ -153,10 +148,7 @@ class RegistrationActivity : AppCompatActivity() {
                     Snackbar.make(binding.signUpBtn, "Something went Wrong", Snackbar.LENGTH_SHORT).show()
                 }
 
-                /* binding.nameEditText.text = null
-                 binding.numberEditText.text= null
-                 binding.emailEditText.text= null
-                 binding.passwordEditText.text= null*/
+
 
             }
 

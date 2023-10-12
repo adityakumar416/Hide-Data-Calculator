@@ -6,9 +6,6 @@ import android.widget.MediaController
 import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.calculator.R
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.ui.PlayerView
 
 class VideoPlayerActivity : AppCompatActivity() {
 

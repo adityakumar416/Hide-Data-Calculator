@@ -11,7 +11,6 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.calculator.R
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -24,7 +23,6 @@ interface VideoItemClickListener {
 
 class VideoAdapter(private val videoItems: MutableList<VideoModel>, private val clickListener: VideoItemClickListener, private val context: Context) : RecyclerView.Adapter<VideoAdapter.VideoViewHolder>() {
 
-    private var exoPlayer: SimpleExoPlayer? = null
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoViewHolder {

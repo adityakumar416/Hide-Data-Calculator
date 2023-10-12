@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "com.example.calculator"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.calculator"
         minSdk = 24
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -41,9 +41,9 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.9.0")
+    implementation("com.google.android.material:material:1.10.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.firebase:firebase-database-ktx:20.2.2")
     implementation("com.google.firebase:firebase-auth-ktx:22.1.2")
@@ -60,9 +60,6 @@ dependencies {
     implementation("net.objecthunter:exp4j:0.4.8")
     implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation ("com.github.bumptech.glide:glide:4.16.0")
-    implementation("com.google.android.exoplayer:exoplayer-core:2.16.1")
-    implementation("com.google.android.exoplayer:exoplayer-ui:2.16.1")
-    implementation ("com.squareup.okhttp3:okhttp:4.9.1")
 
 
 
