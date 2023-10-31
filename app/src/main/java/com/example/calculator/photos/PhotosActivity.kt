@@ -6,6 +6,7 @@ import android.app.ProgressDialog
 import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -30,6 +31,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
+import java.io.ByteArrayOutputStream
 import java.io.IOException
 
 class PhotosActivity : AppCompatActivity() {
@@ -58,7 +60,7 @@ class PhotosActivity : AppCompatActivity() {
         binding.toolbar.setNavigationOnClickListener(View.OnClickListener {
             val main = Intent(applicationContext, LockerActivity::class.java)
             startActivity(main)
-        }) 
+        })
 
         imageList = arrayListOf()
 
@@ -199,14 +201,17 @@ class PhotosActivity : AppCompatActivity() {
             }
 
             uri = data.data!!
-
-            uploadFile(uri)
+          /*  var bytes = byteArrayOf()
             try {
-                val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
-
+                val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
+                val byteArrayOutputStream = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 40, byteArrayOutputStream)
+                bytes = byteArrayOutputStream.toByteArray()
             } catch (e: IOException) {
                 e.printStackTrace()
-            }
+            }*/
+            uploadFile(uri)
+
         }
     }
 
