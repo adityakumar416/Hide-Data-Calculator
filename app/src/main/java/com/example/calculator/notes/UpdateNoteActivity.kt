@@ -9,6 +9,7 @@ import android.widget.Toast
 import com.example.calculator.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
 
 class UpdateNoteActivity : AppCompatActivity() {
 
@@ -52,8 +53,10 @@ class UpdateNoteActivity : AppCompatActivity() {
         }
 
         deletebtn.setOnClickListener {
+            val uid = FirebaseAuth.getInstance().currentUser!!.uid
 
-            val reference = FirebaseDatabase.getInstance().reference.child("note")
+            val reference = FirebaseDatabase.getInstance().getReference(uid).child("note/")
+
             reference.child(id as String).removeValue().addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Toast.makeText(this, "Deleted successfully", Toast.LENGTH_SHORT).show()
