@@ -14,6 +14,8 @@ import com.example.calculator.R
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 
 
@@ -71,8 +73,10 @@ class VideoAdapter(private val videoItems: MutableList<VideoModel>, private val 
 
     private fun showDialog(videoItem: VideoModel) {
 
-        val firebaseStorage = FirebaseStorage.getInstance().getReference("videos/")
-      //  val databaseRef = FirebaseDatabase.getInstance().getReference("images")
+        val uid = FirebaseAuth.getInstance().currentUser!!.uid
+
+        val firebaseStorage = FirebaseStorage.getInstance().getReference(uid).child("videos/")
+
 
         MaterialAlertDialogBuilder(context)
             .setTitle("Delete Video")
