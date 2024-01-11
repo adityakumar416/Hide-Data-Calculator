@@ -133,6 +133,7 @@ class VideosActivity : AppCompatActivity(), VideoItemClickListener  {
 
                 Toast.makeText(this@VideosActivity, "Video Upload Successfully", Toast.LENGTH_SHORT).show()
                 processDialog.dismiss()
+
                 refreshActivity()
 
             }
