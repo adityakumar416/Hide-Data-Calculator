@@ -3,9 +3,12 @@ package com.example.calculator.userAuthentication
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.example.calculator.MainActivity
 import com.example.calculator.databinding.ActivityLoginBinding
 import com.example.calculator.userAuthentication.utlis.Constant
@@ -30,10 +33,8 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var prefManager: PrefManager
     private lateinit var auth: FirebaseAuth
-  //  private lateinit var firebaseDatabase: FirebaseDatabase
-    // [END declare_auth]
+    private lateinit var authViewModel: AuthViewModel
     private lateinit var googleSignInClient: GoogleSignInClient
-    private var userModal: UserModal? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,20 +44,22 @@ class LoginActivity : AppCompatActivity() {
 
         val firebaseDatabase = FirebaseDatabase.getInstance().getReference("user")
 
+        authViewModel = ViewModelProvider(this).get(AuthViewModel::class.java)
+
+        prefManager = PrefManager(this)
+
         binding.forgotPassword.setOnClickListener {
             val intent = Intent(this, ResetPasswordActivity::class.java)
             startActivity(intent)
         }
 
-        // customizeGooglePlusButton(googleSignInButton)
-
         binding.googleSignIn.setOnClickListener {
-            signIn()
+            val signInIntent = googleSignInClient.signInIntent
+            startActivityForResult(signInIntent, RC_SIGN_IN)
         }
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken("608878159622-kk79j9sumkocbg90ofe06fv9jtasajvd.apps.googleusercontent.com")
-            .requestEmail()
-            .build()
+            .requestEmail().build()
 
         googleSignInClient = GoogleSignIn.getClient(this, gso)
         // [END config_signin]
@@ -66,41 +69,39 @@ class LoginActivity : AppCompatActivity() {
         auth = Firebase.auth
         // [END initialize_auth]
 
-        val database = FirebaseDatabase.getInstance()
-        val userNameFatch: DatabaseReference = database.getReference("users") // Replace with your actual path
+        /*  val database = FirebaseDatabase.getInstance()
+          val userNameFatch: DatabaseReference =
+              database.getReference("users") // Replace with your actual path
 
-        userNameFatch.addValueEventListener(object : ValueEventListener {
+          userNameFatch.addValueEventListener(object : ValueEventListener {
 
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                for(postSnapshot in dataSnapshot.children){
+              override fun onDataChange(dataSnapshot: DataSnapshot) {
+                  for (postSnapshot in dataSnapshot.children) {
 
-                    userModal = postSnapshot.getValue(UserModal::class.java)
-                    // Log.i("homeUserData", "onCreateView: UserData > " + postSnapshot.value)
+                      userModal = postSnapshot.getValue(UserModal::class.java)
+                      // Log.i("homeUserData", "onCreateView: UserData > " + postSnapshot.value)
 
-                    userModal?.name?.let { prefManager.name(Constant.PREF_IS_NAME, it) }
-                    userModal?.email?.let { prefManager.email(Constant.PREF_IS_EMAIL, it) }
-                    userModal?.password?.let {prefManager.password(Constant.PREF_IS_PASSWORD,it)}
-
-
-                    Log.i("homeUserData", userModal?.name+userModal?.email+userModal?.password)
-
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-
-            }
-        })
+                      userModal?.name?.let { prefManager.name(Constant.PREF_IS_NAME, it) }
+                      userModal?.email?.let { prefManager.email(Constant.PREF_IS_EMAIL, it) }
+                      userModal?.password?.let { prefManager.password(Constant.PREF_IS_PASSWORD, it) }
 
 
-        prefManager = PrefManager(this  )
+                      Log.i("homeUserData", userModal?.name + userModal?.email + userModal?.password)
+
+                  }
+              }
+
+              override fun onCancelled(error: DatabaseError) {
+
+              }
+          })*/
+        authViewModel.userData.observe(this, userData)
+        authViewModel.fetchUser()
 
         binding.signUp.setOnClickListener {
-
             val intent = Intent(this, RegistrationActivity::class.java)
             startActivity(intent)
             finish()
-
         }
 
 
@@ -109,23 +110,24 @@ class LoginActivity : AppCompatActivity() {
             if (binding.emailEditText.text!!.isEmpty()) {
                 binding.emailEditText.requestFocus()
                 Snackbar.make(
-                    binding.emailEditText,
-                    "Password is Mandatory.",
-                    Snackbar.LENGTH_SHORT
+                    binding.emailEditText, "Password is Mandatory.", Snackbar.LENGTH_SHORT
                 ).show();
-            } else if (binding.passwordEditText.text!!.isEmpty() ) {
+            } else if (binding.passwordEditText.text!!.isEmpty()) {
                 binding.passwordEditText.requestFocus()
                 Snackbar.make(
-                    binding.passwordEditText,
-                    "Password is Mandatory.",
-                    Snackbar.LENGTH_SHORT
+                    binding.passwordEditText, "Password is Mandatory.", Snackbar.LENGTH_SHORT
                 ).show();
             } else {
 
+                binding.loginBtn.visibility = View.GONE
+                binding.progressBar.visibility = View.VISIBLE
                 val email = binding.emailEditText.text.toString().trim()
                 val password = binding.passwordEditText.text.toString().trim()
 
-                FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+                authViewModel.loginResult.observe(this, loginResult)
+                authViewModel.loginWithEmail(email, password)
+
+                /*FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener {
                         if (!it.isSuccessful) return@addOnCompleteListener
 
@@ -143,45 +145,56 @@ class LoginActivity : AppCompatActivity() {
                     .addOnFailureListener {
                         Toast.makeText(this, "${it.message}", Toast.LENGTH_SHORT).show()
 
-                    }
-
-
-
+                    }*/
 
             }
 
         }
 
     }
+
+    var loginResult = Observer<Boolean> { success ->
+        if (success) {
+            binding.loginBtn.visibility = View.VISIBLE
+            binding.progressBar.visibility = View.GONE
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        } else {
+            binding.loginBtn.visibility = View.VISIBLE
+            binding.progressBar.visibility = View.GONE
+            Toast.makeText(this, "Login Failed", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    val userData = Observer<UserModal> { userModal ->
+        userModal.name?.let { prefManager.name(Constant.PREF_IS_NAME, it) }
+        userModal.email?.let { prefManager.email(Constant.PREF_IS_EMAIL, it) }
+        userModal.password?.let { prefManager.password(Constant.PREF_IS_PASSWORD, it) }
+    }
+
+
     override fun onStart() {
         super.onStart()
+
         val currentUser = auth.currentUser
         updateUI(currentUser)
 
-
-
-        if(prefManager.getBoolean(Constant.PREF_IS_LOGIN)){
+        if (prefManager.getBoolean(Constant.PREF_IS_LOGIN)) {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
             finish()
         }
     }
 
-    // [START signin]
-    private fun signIn() {
-        val signInIntent = googleSignInClient.signInIntent
-        startActivityForResult(signInIntent, RC_SIGN_IN)
-    }
 
-
-    // [END signin]
-
-    // [START onactivityresult]
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == RC_SIGN_IN) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            binding.relativeLayout.visibility = View.VISIBLE
+            binding.constraintLayout.visibility = View.GONE
             try {
                 // Google Sign In was successful, authenticate with Firebase
                 val account = task.getResult(ApiException::class.java)!!
@@ -194,27 +207,28 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
-    // [END onactivityresult]
 
-    // [START auth_with_google]
     private fun firebaseAuthWithGoogle(idToken: String) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
-        auth.signInWithCredential(credential)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d(TAG, "signInWithCredential:success")
-                    val user = auth.currentUser
-                    updateUI(user)
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w(TAG, "signInWithCredential:failure", task.exception)
-                    updateUI(null)
-                }
+        auth.signInWithCredential(credential).addOnCompleteListener(this) { task ->
+            if (task.isSuccessful) {
+                // Sign in success, update UI with the signed-in user's information
+                Log.d(TAG, "signInWithCredential:success")
+                val user = auth.currentUser
+                updateUI(user)
+            } else {
+                Log.w(TAG, "signInWithCredential:failure", task.exception)
+                updateUI(null)
+                binding.relativeLayout.visibility = View.VISIBLE
+                binding.constraintLayout.visibility = View.GONE
             }
+        }
     }
+
     private fun updateUI(user: FirebaseUser?) {
-        if(user!=null) {
+        if (user != null) {
+            binding.relativeLayout.visibility = View.GONE
+            binding.constraintLayout.visibility = View.VISIBLE
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
             finish()

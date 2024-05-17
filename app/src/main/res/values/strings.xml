@@ -83,4 +83,34 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+
+
+
+    <string name="fast_playback_speed">%.1fx speed</string>
+    <string name="player_controls_exit">Navigate up</string>
+    <string name="select_playback_speed">Select playback speed</string>
+    <string name="select_audio_track">Select audio track</string>
+    <string name="select_subtitle_track">Select subtitle track</string>
+    <string name="controls_lock">Lock controls</string>
+    <string name="player_controls_progress">Player progress bar</string>
+    <string name="video_zoom">Video zoom</string>
+    <string name="player_controls_previous">Player previous</string>
+    <string name="player_controls_play_pause">Player play pause</string>
+    <string name="player_controls_next">Player next</string>
+    <string name="controls_unlock">Unlock controls</string>
+    <string name="best_fit">Best fit</string>
+    <string name="stretch">Stretch</string>
+    <string name="crop">Crop</string>
+    <string name="hundred_percent">100%</string>
+    <string name="disable">Disable</string>
+    <string name="no_audio_tracks_found">Audio tracks for this video are either unavailable or not supported.</string>
+    <string name="no_subtitle_tracks_found">Subtitle tracks for this video are either unavailable or not supported.</string>
+    <string name="auto_download_live_class_recording_on_your_phone">Auto Download Live Class Recording on your Phone</string>
+    <string name="auto_download_note">Note:- You can auto download your recording by enabling the auto download feature in the settings.</string>
+    <string name="website_link">"Website Link: "</string>
+    <string name="website">Website</string>
+    <string name="our_website_desktop_link">Our Website / Desktop link</string>
+    <string name="close">Close</string>
+
+
 </resources>

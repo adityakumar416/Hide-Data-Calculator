@@ -2,78 +2,89 @@ package com.example.calculator.documents
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.ProgressDialog
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.os.Bundle
-import android.os.ParcelFileDescriptor
 import android.provider.OpenableColumns
 import android.view.View
-import android.widget.Button
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.calculator.LockerActivity
+import com.example.calculator.MainViewModel
 import com.example.calculator.R
+import com.example.calculator.databinding.ActivityDocumentBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 
-class DocumentActivity : AppCompatActivity() {
+class DocumentActivity : AppCompatActivity(), DeleteInterface {
 
     private val PICK_PDF_REQUEST = 1
     private lateinit var selectedDocumentUri: Uri
-    private val documents: MutableList<Document> = mutableListOf()
+    private lateinit var documents: MutableList<Document>
     private lateinit var storageReference: StorageReference
     private lateinit var documentAdapter: DocumentAdapter
+    private var viewModel: MainViewModel? = null
+    private lateinit var binding: ActivityDocumentBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_document)
+        binding = ActivityDocumentBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
-
-        toolbar.setNavigationOnClickListener(View.OnClickListener {
+        setSupportActionBar(toolbar)
+        toolbar.setNavigationOnClickListener {
             val main = Intent(applicationContext, LockerActivity::class.java)
             startActivity(main)
-        })
+        }
 
+        binding.progressBar.visibility = View.VISIBLE
+        binding.mainLayout.visibility = View.GONE
 
-        val uid = FirebaseAuth.getInstance().currentUser!!.uid
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
-        //val storage = FirebaseStorage.getInstance()
-        storageReference = FirebaseStorage.getInstance().getReference(uid).child("documents")
+        documents = mutableListOf()
+        documentAdapter = DocumentAdapter(this, documents, this)
 
         val documentRecyclerView: RecyclerView = findViewById(R.id.documentRecyclerView)
-        documentAdapter = DocumentAdapter(this,documents)
         documentRecyclerView.adapter = documentAdapter
         documentRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Fetch documents from Firebase Storage
-        fetchDocuments()
+        viewModel?.documents?.observe(this, Observer { newDocuments ->
+            binding.progressBar.visibility = View.GONE
+            binding.mainLayout.visibility = View.VISIBLE
+            documents.clear()
+            documents.addAll(newDocuments)
+            documentAdapter.notifyDataSetChanged()
+        })
+        viewModel?.fetchDocuments()
+
+
+        viewModel?.documentsUploadStatus?.observe(this, Observer { success ->
+
+            if (success) {
+                Toast.makeText(this, "Document uploaded successfully", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Document upload failed", Toast.LENGTH_SHORT).show()
+            }
+
+        })
 
         val selectDocumentButton: TextView = findViewById(R.id.selectDocumentButton)
         selectDocumentButton.setOnClickListener {
             openFileChooser()
         }
 
-
-
-
+        val uid = FirebaseAuth.getInstance().currentUser!!.uid
+        storageReference = FirebaseStorage.getInstance().getReference(uid).child("documents")
     }
 
     private fun openFileChooser() {
@@ -90,14 +101,14 @@ class DocumentActivity : AppCompatActivity() {
             selectedDocumentUri = data.data!!
             val documentName = getOriginalFileName(selectedDocumentUri)
 
-           // val documentName = "Document_" + System.currentTimeMillis() + ".pdf"
-            uploadDocumentToFirebaseStorage(documentName, selectedDocumentUri)
+            viewModel?.uploadDocumentToFirebaseStorage(documentName, selectedDocumentUri, this)
+            // val documentName = "Document_" + System.currentTimeMillis() + ".pdf"
+            // uploadDocumentToFirebaseStorage(documentName, selectedDocumentUri)
         }
     }
 
     @SuppressLint("Range")
     private fun getOriginalFileName(uri: Uri?): String {
-        // Use content resolver to get the original file name from the URI
         val cursor = contentResolver.query(uri!!, null, null, null, null)
         cursor?.use {
             if (it.moveToFirst()) {
@@ -106,61 +117,33 @@ class DocumentActivity : AppCompatActivity() {
                 return displayName
             }
         }
-        // If unable to get the original file name, generate a unique name or handle it as per your requirement
         return "video_${System.currentTimeMillis()}.mp4"
     }
 
-    private fun fetchDocuments() {
-        storageReference.listAll()
-            .addOnSuccessListener { listResult ->
-                GlobalScope.launch(Dispatchers.IO) {
-                    for (item in listResult.items) {
-                        val downloadUrl = item.downloadUrl.await().toString()
-                        val document = Document(item.name, item.name, Uri.parse(downloadUrl), downloadUrl)
-                        withContext(Dispatchers.Main) {
-                            documents.add(document)
-                            documentAdapter.notifyDataSetChanged()
-                        }
+
+    override fun onDeleteDocument(document: Document) {
+        val uid = FirebaseAuth.getInstance().currentUser!!.uid
+
+        val firebaseStorage = FirebaseStorage.getInstance().getReference(uid).child("documents/")
+
+        MaterialAlertDialogBuilder(this).setTitle("Delete Document")
+            .setMessage("Do you want to delete this Document ?")
+            .setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+            }.setPositiveButton("Yes") { dialog, _ ->
+                firebaseStorage.storage.getReferenceFromUrl(document.downloadUrl.toString())
+                    .delete().addOnSuccessListener {
+                        Toast.makeText(
+                            this@DocumentActivity, "Document deleted", Toast.LENGTH_SHORT
+                        ).show()
+                        firebaseStorage.child(document.id).delete()
+                        viewModel?.fetchDocuments()
+                    }.addOnFailureListener {
+                        Toast.makeText(
+                            this@DocumentActivity, "Failed to delete document", Toast.LENGTH_SHORT
+                        ).show()
                     }
-                }
-            }
-            .addOnFailureListener { e ->
-                // Handle failure to fetch documents
-                // ...
-            }
-    }
-
-    private fun uploadDocumentToFirebaseStorage(documentName: String, documentUri: Uri) {
-        
-        val fileRef = storageReference.child(documentName)
-        val uploadTask = fileRef.putFile(documentUri)
-
-        val processDialog = ProgressDialog(this@DocumentActivity)
-        processDialog.setMessage("Document Uploading")
-        processDialog.setCancelable(false)
-        processDialog.show()
-
-        uploadTask.addOnSuccessListener { taskSnapshot ->
-            fileRef.downloadUrl.addOnSuccessListener { downloadUri ->
-                val downloadUrl = downloadUri.toString()
-                val documentId = fileRef.name // You can use the document name as the ID
-                val document = Document(documentId, documentName, documentUri, downloadUrl)
-                documents.add(document)
-                documentAdapter.notifyDataSetChanged()
-                processDialog.dismiss()
-            }.addOnFailureListener { e ->
-                // Handle any errors that occurred during getting download URL
-                processDialog.dismiss()
-            }
-        }.addOnFailureListener { e ->
-            processDialog.dismiss()
-            // Handle upload failures
-        }
-            .addOnProgressListener { taskSnapshot -> //displaying the upload progress
-                val progress =
-                    100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount
-                processDialog.setMessage("Uploaded " + progress.toInt() + "%...")
-            }
+            }.show()
     }
 
 

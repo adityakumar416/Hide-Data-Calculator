@@ -12,4 +12,10 @@
     <color name="blacknote">#252525</color>
     <color name="lessblacknote">#3b3b3b</color>
     <color name="lesswhitenote">#656668</color>
+
+
+    <color name="player_background">#4D000000</color>
+    <color name="transparent_white_300">#4DFFFFFF</color>
+    <color name="seed">#2B4241</color>
+
 </resources>

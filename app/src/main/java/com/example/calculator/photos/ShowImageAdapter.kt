@@ -55,6 +55,7 @@ class ShowImageAdapter(
         Picasso
             .get()
             .load(currentImage.url)
+            .placeholder(DrawableHelper.circularProgressDrawable(context))
             .into(holder.image)
 /*
             Glide

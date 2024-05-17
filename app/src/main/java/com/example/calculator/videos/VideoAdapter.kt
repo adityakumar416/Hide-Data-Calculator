@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.calculator.R
+import com.example.calculator.photos.DrawableHelper
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -56,9 +57,11 @@ class VideoAdapter(private val videoItems: MutableList<VideoModel>, private val 
             // Load video thumbnail using Glide
             Glide.with(itemView.context)
                 .load(videoItem.videoUrl)
+                .placeholder(DrawableHelper.circularProgressDrawable(context))
                 .into(videoThumbnailImageView)
 
             videoNameTextView.text = videoItem.videoName
+
             itemView.setOnClickListener {
                 clickListener.onVideoItemClicked(videoItem.videoUrl)
             }

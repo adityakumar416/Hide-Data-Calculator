@@ -50,11 +50,12 @@ class ShowGridViewImageAdapter(
         Picasso
             .get()
             .load(currentImage.url)
+            .placeholder(DrawableHelper.circularProgressDrawable(context))
             .into(holder.image)
-        /*
-                    Glide
-                        .with(Context)
-                    .load(imageModel.url)
+
+                   /* Glide.with(context)
+                    .load(currentImage.url)
+                    .placeholder(DrawableHelper.circularProgressDrawable(context))
                     .into(holder.image)*/
 
 
